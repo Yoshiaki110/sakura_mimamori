@@ -1,7 +1,8 @@
+#include <avr/wdt.h>
 #include <SakuraIO.h>
 
-#define SW  0
-#define LED  14
+#define SW  0					// ※ 確認
+#define LED  14					// ※ 確認
 #define MOTION  16
 #define SOUND  A0
 
@@ -15,6 +16,7 @@ unsigned long _time = 0;
 void setup() {
   //delay(5000);
   Serial.begin(9600);
+  wdt_enable(WDTO_8S);			// ※ 8秒のウォッチドッグタイマーをセット
   pinMode(SW, INPUT);
   pinMode(LED, OUTPUT);
   pinMode(MOTION, INPUT);
@@ -38,10 +40,15 @@ void setup() {
     Serial.println("normal mode");
   }
   Serial.print("Waiting to come online");
-  for(;;){
-    if( (_sakuraio.getConnectionStatus() & 0x80) == 0x80 ) break;
+  for (int i = 0;; i++) {
+    if ( (_sakuraio.getConnectionStatus() & 0x80) == 0x80 ) {
+      break;
+    }
     Serial.print(".");
     delay(1000);
+    if (i < 600) {			// ※ 10分以降はタイマーをクリアーしないのでリセット
+        wdt_reset();
+    }
   }
   Serial.println("");
   delay(2000);
@@ -51,12 +58,15 @@ void setup() {
 void send() {
   if (_sakuraio.enqueueTx(0, (uint32_t)_motion) != CMD_ERROR_NONE) {
     Serial.println("[ERR] enqueue error");
+    delay(10000);		// ※ クリアーできないのでリセットがかかる
   }
   if (_sakuraio.enqueueTx(1, (uint32_t)_sound) != CMD_ERROR_NONE) {
     Serial.println("[ERR] enqueue error");
+    delay(10000);		// ※ クリアーできないのでリセットがかかる
   }
   if (_sakuraio.enqueueTx(2, millis()) != CMD_ERROR_NONE) {
     Serial.println("[ERR] enqueue error");
+    delay(10000);		// ※ クリアーできないのでリセットがかかる
   }
   _sakuraio.send();
   delay(1000);
@@ -65,6 +75,7 @@ void send() {
   uint8_t queued;
   if (_sakuraio.getTxQueueLength(&available, &queued) != CMD_ERROR_NONE) {
     Serial.println("[ERR] get tx queue length error");
+    delay(10000);		// ※ クリアーできないのでリセットがかかる
   }
   Serial.print("Available :");
   Serial.print(available);
@@ -130,4 +141,5 @@ void loop() {
     _sound = 0;
   }
   delay(900);
+  wdt_reset();
 }
