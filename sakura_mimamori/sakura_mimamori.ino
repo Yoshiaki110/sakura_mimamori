@@ -36,7 +36,7 @@ void setup() {
   _time = millis();
 }
 
-void send(long time, int addr, bool errer) {
+void send(long time, int addr) {
   if (_sakuraio.enqueueTx(0, (uint32_t)_motion) != CMD_ERROR_NONE) {
     Serial.println("[ERR] enqueue error");
     reset(time, 11);		// リセット
@@ -57,7 +57,16 @@ void send(long time, int addr, bool errer) {
     Serial.println("[ERR] enqueue error");
     reset(time, 15);    // リセット
   }
-  if (_sakuraio.enqueueTx(5, (uint32_t)addr) != CMD_ERROR_NONE) {
+  uint8_t data[] = {
+    addr,
+    _sakuraio.getConnectionStatus(),
+    _sakuraio.getSignalQuality(),
+    0,
+    0,
+    0,
+    0,
+    0};
+  if (_sakuraio.enqueueTx(5, data) != CMD_ERROR_NONE) {
     Serial.println("[ERR] enqueue error");
     reset(time, 16);    // リセット
   }
@@ -70,7 +79,7 @@ void send(long time, int addr, bool errer) {
   uint8_t queued;
   if (_sakuraio.getTxQueueLength(&available, &queued) != CMD_ERROR_NONE) {
     Serial.println("[ERR] get tx queue length error");
-    reset(time, 17);    // リセット
+    reset(time, 16);    // リセット
   }
   Serial.print("Available :");
   Serial.print(available);
@@ -79,7 +88,11 @@ void send(long time, int addr, bool errer) {
 }
 
 void reset(long time, int addr) {
-  send(time, addr, true); 
+  send(time, addr);   // エラーだよって教える
+  wdt_reset();
+  delay(5000);
+  wdt_reset();
+  _sakuraio.reset();    // さくらのボードをリセット
   delay(10000);    // ※ クリアーできないのでリセットがかかる
 }
 
@@ -127,11 +140,11 @@ int recv() {
                 values[1] * 256L +
                 values[2] * 256 * 256L +
                 values[3] * 256 * 256 * 256L;
-        delay(t);
+        reset(millis(), 17);    // リセット
       }
     } else {
       Serial.println(" ERROR");
-      reset(millis(), 12);    // リセット
+      reset(millis(), 18);    // リセット
     }
   }
   return queued;
@@ -163,11 +176,11 @@ void loop() {
   long time = millis();
   int motion = getMotion();
   int sound = getSound();
-/*  Serial.print(time);
-  Serial.print(" motion:");
+  Serial.print("motion:");
   Serial.print(motion);
   Serial.print(" sound:");
-  Serial.println(sound);*/
+  Serial.print(sound);
+  Serial.print(" ");
   _motion += motion;  // 人感センサはONの累計
   _sound = sound > _sound ? sound : _sound; // 音量は最大値
   int r = recv();
@@ -183,7 +196,7 @@ void loop() {
     Serial.print(_motion);
     Serial.print(" sound:");
     Serial.println(_sound);
-    send(time, 0, false);                     // 送信
+    send(time, 0);                     // 送信
     _time = time;
     _motion = 0;
     _sound = 0;
