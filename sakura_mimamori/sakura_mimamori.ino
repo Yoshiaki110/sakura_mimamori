@@ -15,6 +15,7 @@ unsigned long _time = 0;
 void setup() {
   //delay(5000);
   Serial.begin(9600);
+  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(MOTION, INPUT);
   pinMode(SOUND, INPUT);
   wdt_enable(WDTO_8S);      // ※ 8秒のウォッチドッグタイマーをセット
@@ -106,6 +107,13 @@ int recv() {
 //  Serial.println(queued);
 
   for (uint8_t i = 0; i < queued; i++) {
+    for (int j = 0; j < 10; j++) {
+        wdt_reset();
+        digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)
+        delay(50);                       // wait for a second
+        digitalWrite(LED_BUILTIN, HIGH);    // turn the LED off by making the voltage LOW
+        delay(50);                       // wait for a second
+    }
     uint8_t channel;
     uint8_t type;
     uint8_t values[8];
@@ -202,6 +210,9 @@ void loop() {
     _sound = 0;
   }
   wdt_reset();
-  delay(900);
+  digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)
+  delay(800);                       // wait for a second
+  digitalWrite(LED_BUILTIN, HIGH);    // turn the LED off by making the voltage LOW
+  delay(100);                       // wait for a second
   wdt_reset();
 }
