@@ -109,9 +109,9 @@ int recv() {
   for (uint8_t i = 0; i < queued; i++) {
     for (int j = 0; j < 10; j++) {
         wdt_reset();
-        digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)
+        digitalWrite(LED_BUILTIN, LOW);  // turn the LED on (HIGH is the voltage level)
         delay(50);                       // wait for a second
-        digitalWrite(LED_BUILTIN, HIGH);    // turn the LED off by making the voltage LOW
+        digitalWrite(LED_BUILTIN, HIGH); // turn the LED off by making the voltage LOW
         delay(50);                       // wait for a second
     }
     uint8_t channel;
@@ -212,7 +212,7 @@ void loop() {
   wdt_reset();
   digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)
   delay(800);                       // wait for a second
-  digitalWrite(LED_BUILTIN, HIGH);    // turn the LED off by making the voltage LOW
+  digitalWrite(LED_BUILTIN, HIGH);  // turn the LED off by making the voltage LOW
   delay(100);                       // wait for a second
   wdt_reset();
 }
