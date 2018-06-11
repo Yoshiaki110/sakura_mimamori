@@ -53,6 +53,13 @@ LCDバージョン(ミリ秒でなく秒にする)2x16 7桁で115日
 １行目 _time + int < time
 ２行目 S:time   R:time
 
+  lcd.begin(16, 2);
+  lcd.setRGB(0, 0, 0);
+  lcd.noCursor();
+  lcd.noBlink();
+  lcd.
+  lcd.
+  lcd.
   lcd.setCursor(0, 0);
   lcd.print("initialising..");
   lcd.setCursor(1, 0);
