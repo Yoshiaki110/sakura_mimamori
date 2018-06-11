@@ -27,7 +27,10 @@ void setup() {
       break;
     }
     Serial.print(".");
-    delay(1000);
+    digitalWrite(LED_BUILTIN, HIGH);  // turn the LED off by making the voltage LOW
+    delay(900);                       // wait for a second
+    digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)
+    delay(100);                       // wait for a second
     if (i < 600) {			// ※ 10分以降はタイマーをクリアーしないのでリセット
         wdt_reset();
     }
@@ -80,12 +83,19 @@ void send(long time, int addr) {
   uint8_t queued;
   if (_sakuraio.getTxQueueLength(&available, &queued) != CMD_ERROR_NONE) {
     Serial.println("[ERR] get tx queue length error");
-    reset(time, 16);    // リセット
+    reset(time, 17);    // リセット
   }
   Serial.print("Available :");
   Serial.print(available);
   Serial.print(" Queued :");
   Serial.println(queued);
+  for (int j = 0; j < 6; j++) {
+    wdt_reset();
+    digitalWrite(LED_BUILTIN, LOW);  // turn the LED on (HIGH is the voltage level)
+    delay(50);                       // wait for a second
+    digitalWrite(LED_BUILTIN, HIGH); // turn the LED off by making the voltage LOW
+    delay(50);                       // wait for a second
+  }
 }
 
 void reset(long time, int addr) {
@@ -148,11 +158,11 @@ int recv() {
                 values[1] * 256L +
                 values[2] * 256 * 256L +
                 values[3] * 256 * 256 * 256L;
-        reset(millis(), 17);    // リセット
+        reset(millis(), 21);    // リセット
       }
     } else {
       Serial.println(" ERROR");
-      reset(millis(), 18);    // リセット
+      reset(millis(), 22);    // リセット
     }
   }
   return queued;
@@ -181,7 +191,7 @@ int getSound(){
 }
 
 void loop() {
-  long time = millis();
+  unsigned long time = millis();
   int motion = getMotion();
   int sound = getSound();
   Serial.print("motion:");
