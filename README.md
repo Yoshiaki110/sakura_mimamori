@@ -46,52 +46,54 @@ OutGoingチャンネル
 　３バイト目：SignalQuality
 
 
-USB抜き差しorターミナルのとの接続でか？リセットがかかる
+https://sakura.io/developer/pdf/sakura_module_datasheet_latest.pdf
+
+接続状態
+最上位ビットが１なら、接続状態
+それを除いた、値がエラーコード
+00h エラーなし
+01h 圏外
+02h 接続エラー
+03h 意図しない切断
+
+電界強度
+00h 圏外
+01h 非常に弱い
+02h 弱い
+03h 中くらい
+04h 強い
+05h 非常に強い
 
 
-LCDバージョン(ミリ秒でなく秒にする)2x16 7桁で115日
-１行目 _time + int < time
-２行目 S:time   R:time
 
-  lcd.begin(16, 2);
-  lcd.setRGB(0, 0, 0);
-  lcd.noCursor();
-  lcd.noBlink();
-  lcd.
-  lcd.
-  lcd.
-  lcd.setCursor(0, 0);
-  lcd.print("initialising..");
-  lcd.setCursor(1, 0);
+
+
+
+アップデートする
+
+
+setupでLCD表示
+  lcd.setRGB(0,0,0);    // BG LED OFF
+
+
+  lcd.setCursor(0, 2);
+  lcd.print("%03d/600 %02X %02X, i, _sakuraio.getConnectionStatus(), _sakuraio.getSignalQuality());
+
+100回に１回くらい
+  _sakuraio.reset();    // さくらのボードをリセット
+
+
+
+
+
+
+  lcd.setCursor(0, 2);
+  lcd.print("                ");
+  lcd.setCursor(0, 2);
   lcd.print(i);
+  lcd.print("/600 ");
+  lcd.print(_sakuraio.getConnectionStatus());
+  lcd.print(" ");
+  lcd.print(_sakuraio.getSignalQuality());
 
-void lcd_time_int() {
-  // １行目クリア
-  lcd.setCursor(0, 0);
-  lcd.print(_time / 1000);
-  lcd.setCursor(0, 8);   // カーソルが移動するなら不要
-  lcd.print("+");
-  lcd.setCursor(0, 10);
-  lcd.print(_interval / 1000);
-}
-void lcd_time_int(unsigned long time) {
-  // １行目クリア
-  lcd.setCursor(0, 0);
-  lcd.print((_time + _interval) / 1000);
-  lcd.setCursor(0, 8);   // カーソルが移動するなら不要
-  lcd.print("<");
-  lcd.setCursor(0, 10);
-  lcd.print(time / 1000);
-}
-void lcd_sendtime(unsigned long time) {
-  lcd.setCursor(1, 0);
-  lcd.print("S");
-  lcd.setCursor(1, 1);   // カーソルが移動するなら不要
-  lcd.print(time / 1000);
-}
-void lcd_recvtime(unsigned long time) {
-  lcd.setCursor(1, 8);
-  lcd.print("R");
-  lcd.setCursor(1, 9);   // カーソルが移動するなら不要
-  lcd.print(time / 1000);
-}
+
