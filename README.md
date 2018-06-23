@@ -68,32 +68,3 @@ https://sakura.io/developer/pdf/sakura_module_datasheet_latest.pdf
 
 
 
-
-アップデートする
-
-
-setupでLCD表示
-  lcd.setRGB(0,0,0);    // BG LED OFF
-
-
-  lcd.setCursor(0, 2);
-  lcd.print("%03d/600 %02X %02X, i, _sakuraio.getConnectionStatus(), _sakuraio.getSignalQuality());
-
-100回に１回くらい
-  _sakuraio.reset();    // さくらのボードをリセット
-
-
-
-
-
-
-  lcd.setCursor(0, 2);
-  lcd.print("                ");
-  lcd.setCursor(0, 2);
-  lcd.print(i);
-  lcd.print("/600 ");
-  lcd.print(_sakuraio.getConnectionStatus());
-  lcd.print(" ");
-  lcd.print(_sakuraio.getSignalQuality());
-
-
